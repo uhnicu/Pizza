@@ -156,10 +156,63 @@ body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--brown);m
 .toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
 
 @media print{.app-nav,.hero,.dashboard-header,.btn,.order-delete-btn,.no-print,.conn-bar{display:none!important;}body{background:#fff;padding:0;}.order-card{box-shadow:none;border:1px solid #ccc;page-break-inside:avoid;}#view-guest{display:none!important;}#view-pizzaiolo{display:block!important;}}
+
+/* ── PIZZAIOLO PIN ── */
+.pizzaiolo-pin-screen{position:fixed;inset:0;background:rgba(42,18,0,0.97);z-index:500;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px 20px;}
+.pizzaiolo-pin-screen.hidden{display:none;}
+/* ── PIN SCREEN ── */
+.pin-screen{position:fixed;inset:0;background:var(--brown);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px 20px;}
+.pin-screen.hidden{display:none;}
+.pin-logo{font-size:3.5rem;margin-bottom:12px;}
+.pin-title{font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:900;color:var(--cream);text-align:center;line-height:1.1;}
+.pin-title em{color:var(--gold-light);font-style:italic;}
+.pin-sub{font-family:'Cormorant Garamond',serif;font-style:italic;color:rgba(250,243,232,0.55);font-size:1rem;margin-top:8px;margin-bottom:32px;}
+.pin-input-wrap{display:flex;flex-direction:column;align-items:center;gap:12px;width:100%;max-width:280px;}
+.pin-input{width:100%;padding:16px 20px;font-size:1.1rem;font-family:'Inter',sans-serif;border:1.5px solid rgba(201,146,42,0.4);border-radius:12px;background:rgba(255,255,255,0.08);color:var(--cream);outline:none;text-align:center;letter-spacing:0.1em;transition:border-color 0.2s;}
+.pin-input:focus{border-color:var(--gold-light);}
+.pin-input::placeholder{color:rgba(250,243,232,0.3);letter-spacing:0.05em;}
+.pin-btn{width:100%;padding:15px;background:var(--gold);color:var(--brown);border:none;border-radius:12px;font-family:'Inter',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;letter-spacing:0.05em;transition:background 0.2s;}
+.pin-btn:active{background:var(--gold-light);}
+.pin-error{color:#FF7070;font-size:0.82rem;font-weight:600;letter-spacing:0.04em;min-height:18px;}
+.pin-divider{width:50px;height:1px;background:rgba(201,146,42,0.3);margin:8px 0;}
+
+/* ── ORDER STATUS ── */
+.status-tabs{display:flex;gap:6px;margin-bottom:14px;overflow-x:auto;padding-bottom:2px;}
+.status-tab{flex-shrink:0;padding:6px 14px;border-radius:20px;border:1.5px solid var(--cream-dark);background:var(--cream-mid);font-size:0.75rem;font-weight:600;cursor:pointer;color:var(--brown-mid);transition:all 0.18s;white-space:nowrap;}
+.status-tab.active{background:var(--brown);color:var(--cream);border-color:var(--brown);}
+.order-status-bar{display:flex;gap:5px;margin-top:10px;}
+.status-btn{flex:1;padding:7px 4px;border:1.5px solid var(--cream-dark);border-radius:8px;font-size:0.68rem;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.18s;text-align:center;}
+.status-btn.neu{background:#EFF6FF;color:#2563EB;border-color:#BFDBFE;}
+.status-btn.neu.active{background:#2563EB;color:#fff;border-color:#2563EB;}
+.status-btn.bearbeitung{background:#FEF9C3;color:#92400E;border-color:#FDE68A;}
+.status-btn.bearbeitung.active{background:#F59E0B;color:#fff;border-color:#F59E0B;}
+.status-btn.ausgeliefert{background:#F0FDF4;color:#166534;border-color:#BBF7D0;}
+.status-btn.ausgeliefert.active{background:#16A34A;color:#fff;border-color:#16A34A;}
+.order-card{transition:opacity 0.3s;}
+.order-card.status-ausgeliefert{opacity:0.55;}
+.status-badge{display:inline-flex;align-items:center;gap:4px;font-size:0.68rem;font-weight:700;padding:2px 8px;border-radius:10px;margin-top:4px;}
+.badge-neu{background:#EFF6FF;color:#2563EB;}
+.badge-bearbeitung{background:#FEF9C3;color:#92400E;}
+.badge-ausgeliefert{background:#F0FDF4;color:#166534;}
+.filter-section{display:flex;gap:6px;margin-top:12px;margin-bottom:4px;flex-wrap:wrap;}
+.filter-btn{padding:5px 12px;border-radius:16px;border:1.5px solid var(--cream-dark);background:var(--cream-mid);font-size:0.72rem;font-weight:600;cursor:pointer;color:var(--brown-mid);transition:all 0.18s;white-space:nowrap;}
+.filter-btn.active-filter{background:var(--brown);color:var(--cream);border-color:var(--brown);}
 </style>
 </head>
 <body>
 
+
+<div class="pin-screen" id="pin-screen">
+  <div class="pin-logo">🍕</div>
+  <div class="pin-title"><em>Mafia Kuchen</em> Party</div>
+  <div class="pin-sub">Mitglieder-Zugang erforderlich</div>
+  <div class="pin-divider"></div>
+  <div class="pin-input-wrap">
+    <input class="pin-input" type="password" id="pin-input" placeholder="Zugangscode eingeben" onkeydown="if(event.key==='Enter')checkPin()"/>
+    <button class="pin-btn" onclick="checkPin()">✦ Eintreten</button>
+    <div class="pin-error" id="pin-error"></div>
+  </div>
+</div>
 <div class="conn-bar wait" id="conn-bar">⏳ Verbinde…</div>
 
 <nav class="app-nav">
@@ -275,6 +328,10 @@ body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--brown);m
         <div class="ingredient-grid" id="all-ingredient-grid"></div>
       </div>
       <div class="mt-16">
+        <div class="ingredient-group-title">Kommentar (optional)</div>
+        <textarea id="guest-comment" placeholder="z.B. extra scharf, ohne Rand, bitte schnell…" rows="2" style="width:100%;padding:12px 14px;font-size:0.9rem;font-family:'Inter',sans-serif;border:1.5px solid var(--cream-dark);border-radius:var(--radius-sm);background:var(--cream);color:var(--brown);outline:none;resize:none;transition:border-color 0.2s;margin-bottom:0;" onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--cream-dark)'"></textarea>
+      </div>
+      <div class="mt-16">
         <button class="btn btn-primary" onclick="savePizza()">✦ Pizza speichern</button>
       </div>
     </div>
@@ -299,6 +356,12 @@ body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--brown);m
     <div class="order-count-badge"><span class="live-dot"></span><span id="order-count-badge">0 Bestellungen</span></div>
   </div>
   <div class="container">
+    <div class="filter-section no-print">
+      <button class="filter-btn active-filter" id="filter-all" onclick="setFilter('all')">🍕 Alle</button>
+      <button class="filter-btn" id="filter-neu" onclick="setFilter('neu')">🔵 Neu</button>
+      <button class="filter-btn" id="filter-bearbeitung" onclick="setFilter('bearbeitung')">🟡 In Bearbeitung</button>
+      <button class="filter-btn" id="filter-ausgeliefert" onclick="setFilter('ausgeliefert')">✅ Ausgeliefert</button>
+    </div>
     <div class="flex-row mt-12 no-print">
       <button class="btn btn-secondary btn-sm" onclick="window.print()">🖨️ Drucken</button>
       <div class="spacer"></div>
@@ -313,6 +376,18 @@ body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--brown);m
 </div>
 
 <div class="toast" id="toast"></div>
+
+<div class="pizzaiolo-pin-screen hidden" id="pizzaiolo-pin-screen">
+  <div style="font-size:3rem;margin-bottom:12px;">👨‍🍳</div>
+  <div style="font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:900;color:var(--cream);margin-bottom:6px;">Cucina — Zugang</div>
+  <div style="font-family:'Cormorant Garamond',serif;font-style:italic;color:rgba(250,243,232,0.5);font-size:0.95rem;margin-bottom:28px;">Nur für den Pizzaiolo</div>
+  <div style="display:flex;flex-direction:column;align-items:center;gap:12px;width:100%;max-width:280px;">
+    <input class="pin-input" type="password" id="pizzaiolo-pin-input" placeholder="Pizzaiolo-Code" onkeydown="if(event.key==='Enter')checkPizzaioloPin()"/>
+    <button class="pin-btn" onclick="checkPizzaioloPin()">✦ Eintreten</button>
+    <div class="pin-error" id="pizzaiolo-pin-error"></div>
+    <button onclick="hidePizzaioloPin()" style="background:none;border:none;color:rgba(250,243,232,0.35);font-size:0.8rem;cursor:pointer;margin-top:4px;">← Zurück</button>
+  </div>
+</div>
 
 <script>
 const FIREBASE_DB="https://pizzaparty-6cf83-default-rtdb.europe-west1.firebasedatabase.app";
@@ -512,7 +587,7 @@ const TOPPING_POSITIONS={
   dogmeat: [[88,82],[152,82],[162,125],[148,162],[112,170],[78,162],[62,122],[120,68]],
 };
 
-let selectedTemplate=null,activeIngredients=new Set(),allOrders={};
+let selectedTemplate=null,activeIngredients=new Set(),allOrders={},currentFilter='all';
 
 async function fbPush(d){const r=await fetch(FIREBASE_DB+'/orders.json',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(d)});if(!r.ok)throw new Error('HTTP '+r.status);return r.json();}
 async function fbDelete(k){const r=await fetch(FIREBASE_DB+'/orders/'+k+'.json',{method:'DELETE'});if(!r.ok)throw new Error('HTTP '+r.status);}
@@ -521,13 +596,71 @@ async function fbGet(){const r=await fetch(FIREBASE_DB+'/orders.json');if(!r.ok)
 
 function setBar(cls,txt){const b=document.getElementById('conn-bar');b.className='conn-bar '+cls;b.textContent=txt;}
 async function pollOnce(){try{const d=await fbGet();allOrders=d||{};renderDashboard();setBar('ok','🟢 Live — Verbunden');}catch(e){setBar('err','🔴 Verbindungsfehler');}}
-function init(){renderTemplates();setBar('wait','⏳ Verbinde…');pollOnce();setInterval(pollOnce,4000);}
+function playNewOrder(){
+  try{
+    const c=new(window.AudioContext||window.webkitAudioContext)();
+    [[523,0,0.15],[659,0.15,0.15],[784,0.3,0.15],[1047,0.45,0.4]].forEach(([f,t,d])=>{
+      const o=c.createOscillator(),g=c.createGain();
+      o.type='square';o.frequency.value=f;
+      g.gain.setValueAtTime(0.3,c.currentTime+t);
+      g.gain.linearRampToValueAtTime(0,c.currentTime+t+d);
+      o.connect(g);g.connect(c.destination);
+      o.start(c.currentTime+t);o.stop(c.currentTime+t+d+0.05);
+    });
+    if(navigator.vibrate)navigator.vibrate([100,50,100]);
+  }catch(e){}
+}
+
+let lastOrderCount=0;
+
+function init(){
+  // Check if already unlocked this session
+  if(sessionStorage.getItem('unlocked')==='1'){
+    document.getElementById('pin-screen').classList.add('hidden');
+    renderTemplates();setBar('wait','⏳ Verbinde…');pollOnce();setInterval(pollOnce,4000);
+  }
+}
+function checkPin(){
+  const val=document.getElementById('pin-input').value.trim().toLowerCase();
+  const err=document.getElementById('pin-error');
+  if(val==='nigga'){
+    sessionStorage.setItem('unlocked','1');
+    document.getElementById('pin-screen').classList.add('hidden');
+    renderTemplates();setBar('wait','⏳ Verbinde…');pollOnce();setInterval(pollOnce,4000);
+  } else {
+    err.textContent='Falscher Code. Versuch es nochmal.';
+    document.getElementById('pin-input').value='';
+    setTimeout(()=>err.textContent='',2500);
+  }
+}
 
 function switchView(v){
+  if(v==='pizzaiolo'&&sessionStorage.getItem('pizzaiolo_unlocked')!=='1'){
+    document.getElementById('pizzaiolo-pin-screen').classList.remove('hidden');
+    return;
+  }
   document.getElementById('view-guest').classList.toggle('active',v==='guest');
   document.getElementById('view-pizzaiolo').classList.toggle('active',v==='pizzaiolo');
   document.getElementById('nav-guest').classList.toggle('active',v==='guest');
   document.getElementById('nav-pizzaiolo').classList.toggle('active',v==='pizzaiolo');
+}
+function checkPizzaioloPin(){
+  const val=document.getElementById('pizzaiolo-pin-input').value.trim();
+  const err=document.getElementById('pizzaiolo-pin-error');
+  if(val==='69'){
+    sessionStorage.setItem('pizzaiolo_unlocked','1');
+    document.getElementById('pizzaiolo-pin-screen').classList.add('hidden');
+    document.getElementById('pizzaiolo-pin-input').value='';
+    switchView('pizzaiolo');
+  } else {
+    err.textContent='Falscher Code.';
+    document.getElementById('pizzaiolo-pin-input').value='';
+    setTimeout(()=>err.textContent='',2000);
+  }
+}
+function hidePizzaioloPin(){
+  document.getElementById('pizzaiolo-pin-screen').classList.add('hidden');
+  document.getElementById('pizzaiolo-pin-input').value='';
 }
 
 function renderTemplates(){
@@ -618,8 +751,9 @@ async function savePizza(){
   if(!name){showToast('Bitte deinen Namen eingeben 👤');return;}
   if(!selectedTemplate){showToast('Bitte eine Vorlage wählen');return;}
   if(!activeIngredients.size){showToast('Mindestens eine Zutat wählen');return;}
+  const comment=document.getElementById('guest-comment').value.trim();
   const order={name,templateId:selectedTemplate.id,templateName:selectedTemplate.name,
-    templateEmoji:selectedTemplate.emoji,ingredients:[...activeIngredients],timestamp:new Date().toISOString()};
+    templateEmoji:selectedTemplate.emoji,ingredients:[...activeIngredients],comment:comment||'',timestamp:new Date().toISOString()};
   try{await fbPush(order);showConfirmation(order);showToast('Pizza gespeichert! 🎉');pollOnce();}
   catch(e){showToast('Fehler: '+e.message);}
 }
@@ -637,35 +771,65 @@ function resetForm(){
   document.getElementById('guest-name').value='';
   document.getElementById('step3-card').style.display='none';
   document.getElementById('confirm-box').classList.remove('visible');
-  selectedTemplate=null;activeIngredients=new Set();
+  selectedTemplate=null;activeIngredients=new Set();const gc=document.getElementById('guest-comment');if(gc)gc.value='';
   document.querySelectorAll('.template-card').forEach(c=>c.classList.remove('selected'));
   document.getElementById('step2-ind').classList.remove('active');
   document.getElementById('step3-ind').classList.remove('active');
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
+function setFilter(f){
+  currentFilter=f;
+  ['all','neu','bearbeitung','ausgeliefert'].forEach(k=>{
+    const el=document.getElementById('filter-'+k);
+    if(el)el.classList.toggle('active-filter',k===f);
+  });
+  renderDashboard();
+}
+
+function setStatus(key,status){
+  // Store status in firebase under orders/key/status
+  fetch(FIREBASE_DB+'/orders/'+key+'/status.json',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(status)})
+    .then(()=>pollOnce()).catch(e=>showToast('Fehler: '+e.message));
+}
+
 function renderDashboard(){
   const orders=Object.entries(allOrders).map(([key,val])=>({...val,_key:key}))
     .sort((a,b)=>new Date(a.timestamp)-new Date(b.timestamp));
   document.getElementById('order-count-badge').textContent=`${orders.length} Bestellung${orders.length!==1?'en':''}`;
+  const filtered=currentFilter==='all'?orders:orders.filter(o=>(o.status||'neu')===currentFilter);
   const c=document.getElementById('orders-container');
-  c.innerHTML=orders.length
-    ?orders.map(o=>orderCardHTML(o)).join('')
-    :`<div class="empty-state"><span class="e-emoji">🍕</span><p>Noch keine Bestellungen.<br>Die Gäste sind dran!</p></div>`;
+  c.innerHTML=filtered.length
+    ?filtered.map(o=>orderCardHTML(o)).join('')
+    :orders.length
+      ?`<div class="empty-state"><span class="e-emoji">🍕</span><p>Keine Bestellungen in dieser Kategorie.</p></div>`
+      :`<div class="empty-state"><span class="e-emoji">🍕</span><p>Noch keine Bestellungen.<br>Die Gäste sind dran!</p></div>`;
   renderSummary(orders);
 }
 
 function orderCardHTML(o){
   const ings=[...new Set(o.ingredients)].map(id=>ING_MAP[id]).filter(Boolean);
   const ts=new Date(o.timestamp).toLocaleTimeString('de-CH',{hour:'2-digit',minute:'2-digit'});
-  return `<div class="order-card">
+  const status=o.status||'neu';
+  const badgeMap={neu:'badge-neu',bearbeitung:'badge-bearbeitung',ausgeliefert:'badge-ausgeliefert'};
+  const labelMap={neu:'🔵 Neu',bearbeitung:'🟡 In Bearbeitung',ausgeliefert:'✅ Ausgeliefert'};
+  return `<div class="order-card status-${status}" id="oc-${o._key}">
     <button class="order-delete-btn" onclick="deleteOrder('${o._key}')">✕</button>
     <div class="order-card-header">
-      <div><div class="order-person-name">${esc(o.name)}</div>
-      <div style="font-size:0.68rem;color:#C4A882;margin-top:2px;font-style:italic">🕐 ${ts}</div></div>
+      <div>
+        <div class="order-person-name">${esc(o.name)}</div>
+        <div style="font-size:0.68rem;color:#C4A882;margin-top:2px;font-style:italic">🕐 ${ts}</div>
+        <span class="status-badge ${badgeMap[status]}">${labelMap[status]}</span>
+      </div>
       <div class="order-template-badge">${o.templateEmoji} ${esc(o.templateName)}</div>
     </div>
     <div class="order-ings">${ings.map(i=>`<span class="order-ing-tag">${i.emoji} ${i.name}</span>`).join('')}</div>
+    ${o.comment?`<div style="margin-top:8px;padding:8px 10px;background:var(--gold-pale);border:1px solid rgba(201,146,42,0.3);border-radius:8px;font-size:0.78rem;color:var(--brown-mid);font-style:italic;">💬 ${esc(o.comment)}</div>`:''}
+    <div class="order-status-bar">
+      <button class="status-btn neu${status==='neu'?' active':''}" onclick="setStatus('${o._key}','neu')">🔵 Neu</button>
+      <button class="status-btn bearbeitung${status==='bearbeitung'?' active':''}" onclick="setStatus('${o._key}','bearbeitung')">🟡 In Bearbeitung</button>
+      <button class="status-btn ausgeliefert${status==='ausgeliefert'?' active':''}" onclick="setStatus('${o._key}','ausgeliefert')">✅ Ausgeliefert</button>
+    </div>
   </div>`;
 }
 
